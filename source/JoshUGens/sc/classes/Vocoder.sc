@@ -4,12 +4,12 @@ Vocoder {
 	
 	
 	
-	*ar { 	arg car, mod, num, low=100, high=5000, q=0.02, hpf=5000, hpfscal=0.05, outscal=25;
+	*ar { 	arg car, mod, num, low=100, high=5000, q=0.02, hpf=5000, hpfscal=0.05, outscal=25, smooth = 10, spread = 1, center = 0;
 	
 			var width, cf, hf,  out, filtmod, filtcar, tracker, ratio;
 	
 	
-		out = Mix.arFill(( num + 1 ), { arg i; 
+		out = Splay.arFill(( num + 1 ), { arg i; 
 					
 					ratio = (( high / low)**num.reciprocal );
 	
@@ -18,12 +18,14 @@ Vocoder {
 					filtmod = BPF.ar( mod, cf, q);
 				
 					tracker = Amplitude.kr(filtmod);
+
+          tracker = LPF.kr(tracker, smooth);
 				
 					filtcar = BPF.ar( car, cf, q);	
 				
 	 
 					( outscal * ( filtcar * tracker ));
-					});
+					},spread,1,center);
 
 		hf = HPF.ar(HPF.ar( mod, hpf), hpf);
 
