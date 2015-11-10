@@ -4,13 +4,26 @@ Vocoder {
 	
 	
 	
-	*ar { 	arg car, mod, num, low=100, high=5000, q=0.02, hpf=5000, hpfscal=0.05, outscal=25, smooth = 10, spread = 0, center = 0;
+	*ar { 	arg car, mod, num, low=100, high=5000, q=0.02, hpf=5000, hpfscal=0.05, outscal=25, smooth = 10, spread = 0, center = 0, distribution = 0;
 	
 			var width, cf, hf,  out, filtmod, filtcar, tracker, ratio;
 	
 	
 		out = Splay.arFill(( num + 1 ), { arg i; 
-					
+			
+          switch (distribution, 
+            0, {
+              if (i % 0 == 0) {
+                i = num - i;
+              };
+            },
+            1, {
+            },
+            2, {
+              i = num - i;
+            }
+          );
+
 					ratio = (( high / low)**num.reciprocal );
 	
 				 	cf =  ( ratio**i) * low;
