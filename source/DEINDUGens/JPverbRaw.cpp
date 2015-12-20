@@ -55,6 +55,10 @@ template <> 	 inline int faustpower<1>(int x)            { return x; }
 
 using namespace std;
 
+#if !defined(NDEBUG)
+#define NDEBUG 1
+#endif
+
 #if defined(__GNUC__) && __GNUC__ >= 4
 # define FAUST_EXPORT __attribute__((visibility("default")))
 #else
