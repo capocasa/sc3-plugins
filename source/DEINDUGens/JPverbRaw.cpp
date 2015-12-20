@@ -1596,8 +1596,13 @@ FAUST_EXPORT void load(InterfaceTable* inTable)
         );
 
 #if !defined(NDEBUG)
-    Print("Faust: %s numControls=%d\n", name.c_str(), g_numControls);
+    Print("JPverbRaw: %s numControls=%d\n", name.c_str(), g_numControls);
 #endif // NDEBUG
 }
 
+#ifdef SUPERNOVA 
+extern "C" FAUST_EXPORT int server_type(void) { return sc_server_supernova; } 
+#else 
+extern "C" FAUST_EXPORT int server_type(void) { return sc_server_scsynth; } 
+#endif
 // EOF
