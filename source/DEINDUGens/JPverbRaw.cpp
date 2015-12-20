@@ -1305,7 +1305,7 @@ class mydsp : public dsp {
 // SuperCollider/Faust interface
 //----------------------------------------------------------------------------
 
-struct Faust : public Unit
+struct JPverbRaw : public Unit
 {
     // Faust dsp instance
     FAUSTCLASS  mDSP;
@@ -1357,7 +1357,7 @@ void initState(const std::string& name, int sampleRate)
 
 size_t unitSize()
 {
-    return sizeof(Faust) + g_numControls * sizeof(Control);
+    return sizeof(JPverbRaw) + g_numControls * sizeof(Control);
 }
 
 std::string fileNameToUnitName(const std::string& fileName)
@@ -1400,11 +1400,11 @@ extern "C"
     int api_version(void);
 #endif
     void load(InterfaceTable*);
-    void Faust_next(Faust*, int);
-    void Faust_next_copy(Faust*, int);
-    void Faust_next_clear(Faust*, int);
-    void Faust_Ctor(Faust*);
-    void Faust_Dtor(Faust*);
+    void Faust_next(JPverbRaw*, int);
+    void Faust_next_copy(JPverbRaw*, int);
+    void Faust_next_clear(JPverbRaw*, int);
+    void Faust_Ctor(JPverbRaw*);
+    void Faust_Dtor(JPverbRaw*);
 };
 
 inline static void fillBuffer(float* dst, int n, float v)
@@ -1422,7 +1422,7 @@ inline static void copyBuffer(float* dst, int n, float* src)
     Copy(n, dst, src);
 }
 
-inline static void Faust_updateControls(Faust* unit)
+inline static void Faust_updateControls(JPverbRaw* unit)
 {
     Control* controls = unit->mControls;
     int numControls   = unit->mNumControls;
@@ -1434,7 +1434,7 @@ inline static void Faust_updateControls(Faust* unit)
     }
 }
 
-void Faust_next(Faust* unit, int inNumSamples)
+void Faust_next(JPverbRaw* unit, int inNumSamples)
 {
     // update controls
     Faust_updateControls(unit);
@@ -1442,7 +1442,7 @@ void Faust_next(Faust* unit, int inNumSamples)
     unit->mDSP.compute(inNumSamples, unit->mInBuf, unit->mOutBuf);
 }
 
-void Faust_next_copy(Faust* unit, int inNumSamples)
+void Faust_next_copy(JPverbRaw* unit, int inNumSamples)
 {
     // update controls
     Faust_updateControls(unit);
@@ -1463,12 +1463,12 @@ void Faust_next_copy(Faust* unit, int inNumSamples)
     unit->mDSP.compute(inNumSamples, unit->mInBufCopy, unit->mOutBuf);
 }
 
-void Faust_next_clear(Faust* unit, int inNumSamples)
+void Faust_next_clear(JPverbRaw* unit, int inNumSamples)
 {
     ClearUnitOutputs(unit, inNumSamples);
 }
 
-void Faust_Ctor(Faust* unit)  // module constructor
+void Faust_Ctor(JPverbRaw* unit)  // module constructor
 {
     // init dsp
     unit->mDSP.instanceInit((int)SAMPLERATE);
@@ -1534,7 +1534,7 @@ void Faust_Ctor(Faust* unit)  // module constructor
     }
 }
 
-void Faust_Dtor(Faust* unit)  // module destructor
+void Faust_Dtor(JPverbRaw* unit)  // module destructor
 {
     if (unit->mInBufValue) {
         RTFree(unit->mWorld, unit->mInBufValue);
