@@ -5,7 +5,7 @@
 // license: "none"
 // copyright: "(c) Julian Parker 2013"
 //
-// Code generated with Faust 0.9.62 (http://faust.grame.fr)
+// Code generated with JPverbRaw 0.9.62 (http://faust.grame.fr)
 //-----------------------------------------------------
 /* link with : "primes" */
 #include <jprev.h>
@@ -19,9 +19,9 @@ template <int N> inline int faustpower(int x)              { return faustpower<N
 template <> 	 inline int faustpower<0>(int x)            { return 1; }
 template <> 	 inline int faustpower<1>(int x)            { return x; }
 #endif
-// If other than 'faust2sc --prefix Faust' is used, sed this as well:
+// If other than 'faust2sc --prefix JPverbRaw' is used, sed this as well:
 #if !defined(SC_FAUST_PREFIX)
-# define SC_FAUST_PREFIX "Faust"
+# define SC_FAUST_PREFIX "JPverbRaw"
 #endif
 
 //-------------------------------------------------------------------
@@ -54,6 +54,10 @@ template <> 	 inline int faustpower<1>(int x)            { return x; }
 #include <faust/misc.h>
 
 using namespace std;
+
+#if !defined(NDEBUG)
+#define NDEBUG 1
+#endif
 
 #if defined(__GNUC__) && __GNUC__ >= 4
 # define FAUST_EXPORT __attribute__((visibility("default")))
@@ -409,7 +413,7 @@ class mydsp : public dsp {
 		m->declare("author", "Julian Parker");
 		m->declare("license", "none");
 		m->declare("copyright", "(c) Julian Parker 2013");
-		m->declare("oscillator.lib/name", "Faust Oscillator Library");
+		m->declare("oscillator.lib/name", "JPverbRaw Oscillator Library");
 		m->declare("oscillator.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
 		m->declare("oscillator.lib/copyright", "Julius O. Smith III");
 		m->declare("oscillator.lib/version", "1.11");
@@ -424,7 +428,7 @@ class mydsp : public dsp {
 		m->declare("math.lib/copyright", "GRAME");
 		m->declare("math.lib/version", "1.0");
 		m->declare("math.lib/license", "LGPL with exception");
-		m->declare("filter.lib/name", "Faust Filter Library");
+		m->declare("filter.lib/name", "JPverbRaw Filter Library");
 		m->declare("filter.lib/author", "Julius O. Smith (jos at ccrma.stanford.edu)");
 		m->declare("filter.lib/copyright", "Julius O. Smith III");
 		m->declare("filter.lib/version", "1.29");
@@ -1302,12 +1306,12 @@ class mydsp : public dsp {
 
 
 //----------------------------------------------------------------------------
-// SuperCollider/Faust interface
+// SuperCollider/JPverbRaw interface
 //----------------------------------------------------------------------------
 
-struct Faust : public Unit
+struct JPverbRaw : public Unit
 {
-    // Faust dsp instance
+    // JPverbRaw dsp instance
     FAUSTCLASS  mDSP;
     // Buffers for control to audio rate conversion
     float**     mInBufCopy;
@@ -1357,7 +1361,7 @@ void initState(const std::string& name, int sampleRate)
 
 size_t unitSize()
 {
-    return sizeof(Faust) + g_numControls * sizeof(Control);
+    return sizeof(JPverbRaw) + g_numControls * sizeof(Control);
 }
 
 std::string fileNameToUnitName(const std::string& fileName)
@@ -1400,11 +1404,11 @@ extern "C"
     int api_version(void);
 #endif
     void load(InterfaceTable*);
-    void Faust_next(Faust*, int);
-    void Faust_next_copy(Faust*, int);
-    void Faust_next_clear(Faust*, int);
-    void Faust_Ctor(Faust*);
-    void Faust_Dtor(Faust*);
+    void Faust_next(JPverbRaw*, int);
+    void Faust_next_copy(JPverbRaw*, int);
+    void Faust_next_clear(JPverbRaw*, int);
+    void Faust_Ctor(JPverbRaw*);
+    void Faust_Dtor(JPverbRaw*);
 };
 
 inline static void fillBuffer(float* dst, int n, float v)
@@ -1422,7 +1426,7 @@ inline static void copyBuffer(float* dst, int n, float* src)
     Copy(n, dst, src);
 }
 
-inline static void Faust_updateControls(Faust* unit)
+inline static void Faust_updateControls(JPverbRaw* unit)
 {
     Control* controls = unit->mControls;
     int numControls   = unit->mNumControls;
@@ -1434,7 +1438,7 @@ inline static void Faust_updateControls(Faust* unit)
     }
 }
 
-void Faust_next(Faust* unit, int inNumSamples)
+void Faust_next(JPverbRaw* unit, int inNumSamples)
 {
     // update controls
     Faust_updateControls(unit);
@@ -1442,7 +1446,7 @@ void Faust_next(Faust* unit, int inNumSamples)
     unit->mDSP.compute(inNumSamples, unit->mInBuf, unit->mOutBuf);
 }
 
-void Faust_next_copy(Faust* unit, int inNumSamples)
+void Faust_next_copy(JPverbRaw* unit, int inNumSamples)
 {
     // update controls
     Faust_updateControls(unit);
@@ -1463,14 +1467,14 @@ void Faust_next_copy(Faust* unit, int inNumSamples)
     unit->mDSP.compute(inNumSamples, unit->mInBufCopy, unit->mOutBuf);
 }
 
-void Faust_next_clear(Faust* unit, int inNumSamples)
+void Faust_next_clear(JPverbRaw* unit, int inNumSamples)
 {
     ClearUnitOutputs(unit, inNumSamples);
 }
 
-void Faust_Ctor(Faust* unit)  // module constructor
+void Faust_Ctor(JPverbRaw* unit)  // module constructor
 {
-    // init dsp
+  // init dsp
     unit->mDSP.instanceInit((int)SAMPLERATE);
 
     // allocate controls
@@ -1515,7 +1519,7 @@ void Faust_Ctor(Faust* unit)  // module constructor
             SETCALC(Faust_next_copy);
         }
 #if !defined(NDEBUG)
-        Print("Faust[%s]:\n", g_unitName);
+        Print("JPverbRaw[%s]:\n", g_unitName);
         Print("    Inputs:   %d\n"
               "    Outputs:  %d\n"
               "    Callback: %s\n",
@@ -1523,7 +1527,7 @@ void Faust_Ctor(Faust* unit)  // module constructor
               unit->mCalcFunc == (UnitCalcFunc)Faust_next ? "zero-copy" : "copy");
 #endif
     } else {
-        Print("Faust[%s]:\n", g_unitName);
+        Print("JPverbRaw[%s]:\n", g_unitName);
         Print("    Input/Output channel mismatch\n"
               "        Inputs:  faust %d, unit %d\n"
               "        Outputs: faust %d, unit %d\n",
@@ -1534,7 +1538,7 @@ void Faust_Ctor(Faust* unit)  // module constructor
     }
 }
 
-void Faust_Dtor(Faust* unit)  // module destructor
+void Faust_Dtor(JPverbRaw* unit)  // module destructor
 {
     if (unit->mInBufValue) {
         RTFree(unit->mWorld, unit->mInBufValue);
@@ -1567,12 +1571,12 @@ FAUST_EXPORT void load(InterfaceTable* inTable)
     name = normalizeClassName(name);
 
 #if !defined(NDEBUG) & defined(SC_API_EXPORT)
-    Print("Faust: supercollider.cpp: sc_api_version = %d\n",sc_api_version);
+    Print("JPverbRaw: supercollider.cpp: sc_api_version = %d\n",sc_api_version);
 #endif
 
     if (name.empty()) {
         // Catch empty name
-        Print("Faust [supercollider.cpp]:\n"
+        Print("JPverbRaw [supercollider.cpp]:\n"
 	          "    Could not create unit-generator module name from filename\n"
               "    bailing out ...\n");
         return;
@@ -1596,8 +1600,13 @@ FAUST_EXPORT void load(InterfaceTable* inTable)
         );
 
 #if !defined(NDEBUG)
-    Print("Faust: %s numControls=%d\n", name.c_str(), g_numControls);
+    Print("JPverbRaw: %s numControls=%d\n", name.c_str(), g_numControls);
 #endif // NDEBUG
 }
 
+#ifdef SUPERNOVA 
+extern "C" FAUST_EXPORT int server_type(void) { return sc_server_supernova; } 
+#else 
+extern "C" FAUST_EXPORT int server_type(void) { return sc_server_scsynth; } 
+#endif
 // EOF
