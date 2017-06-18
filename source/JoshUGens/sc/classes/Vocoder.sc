@@ -4,7 +4,7 @@ Vocoder {
 	
 	
 	
-	*ar { 	arg car, mod, num, low=100, high=5000, q=0.02, hpf=5000, hpfscal=0.05, outscal=25, smooth = 10, spread = 0, center = 0, distribution = 0;
+	*ar { 	arg car, mod, num, low=100, high=5000, q=0.02, hpf=5000, hpfscal=0.05, outscal=25, smooth = 10, spread = 0, center = 0, distribution = 0, cLPF=LPF, cBPF=BPF, cHPF=HPF;
 	
 			var width, cf, hf,  out, filtmod, filtcar, tracker, ratio;
 	
@@ -28,24 +28,24 @@ Vocoder {
 	
 				 	cf =  ( ratio**i) * low;
 				 	
-					filtmod = BPF.ar( mod, cf, q);
+					filtmod = cBPF.ar( mod, cf, q);
 				
 					tracker = Amplitude.kr(filtmod);
 
-          tracker = LPF.kr(tracker, smooth);
+          tracker = cLPF.kr(tracker, smooth);
 				
-					filtcar = BPF.ar( car, cf, q);	
+					filtcar = cBPF.ar( car, cf, q);	
 				
 	 
 					( outscal * ( filtcar * tracker ));
 					},spread,1,center);
 
-		hf = HPF.ar(HPF.ar( mod, hpf), hpf);
+		hf = cHPF.ar(HPF.ar( mod, hpf), hpf);
 
 		
 		^out + ( hpfscal * hf )}
 
-	*bark {arg signal, input, mull = 10;
+	*bark {arg signal, input, mull = 10, cBPF=BPF;
 
                 var sourceAmp, freqArray, bwArray;
 
@@ -61,7 +61,7 @@ Vocoder {
                         var output, freq, bandWidth;
                         freq = freqArray.at(i);
                         bandWidth = bwArray.at(i);
-                        output = BPF.ar(signal, freqArray.at(i),bandWidth/freq, sourceAmp)*mull
+                        output = cBPF.ar(signal, freqArray.at(i),bandWidth/freq, sourceAmp)*mull
                 })
         }
      }
